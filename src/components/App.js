@@ -12,6 +12,7 @@ class Timer extends React.Component {
     };
     this.handleClick = this.handleClick.bind(this);
     this.componentDidUpdate = this.componentDidUpdate.bind(this);
+    this.eventHandle = this.eventHandle.bind(this);
     this.intervalId = 0;
   }
   componentDidMount() {
@@ -42,6 +43,7 @@ class Timer extends React.Component {
   componentDidUpdate() {
     if (this.state.x === 250 && this.state.y === 250) {
       clearInterval(this.intervalId);
+      document.removeEventListener("keydown", this.eventHandle);
     }
   }
   componentWillUnmount() {}
@@ -51,33 +53,35 @@ class Timer extends React.Component {
     stateCopy.is_started = !this.state.is_started;
     this.setState(stateCopy, () => {
       if (this.state.is_started) {
-        document.addEventListener("keydown", (event) => {
-          let x = this.state.x;
-          let y = this.state.y;
-          if (event.keyCode === 37) {
-            x -= 5;
-          } else if (event.keyCode === 38) {
-            y -= 5;
-          } else if (event.keyCode === 39) {
-            x += 5;
-          } else if (event.keyCode === 40) {
-            y += 5;
-          }
-          let stateCopy = this.state;
-          stateCopy.x = x;
-          stateCopy.y = y;
-          this.setState(stateCopy, () => {
-            let stateCopy = this.state;
-            stateCopy.class = { top: this.state.y, left: this.state.x };
-            this.setState(stateCopy);
-          });
-        });
+        document.addEventListener("keydown", this.eventHandle);
         this.intervalId = setInterval(() => {
           let stateCopy = this.state;
           stateCopy.time++;
           this.setState(stateCopy);
         }, 1000);
       }
+    });
+  }
+
+  eventHandle(event) {
+    let x = this.state.x;
+    let y = this.state.y;
+    if (event.keyCode === 37) {
+      x -= 5;
+    } else if (event.keyCode === 38) {
+      y -= 5;
+    } else if (event.keyCode === 39) {
+      x += 5;
+    } else if (event.keyCode === 40) {
+      y += 5;
+    }
+    let stateCopy = this.state;
+    stateCopy.x = x;
+    stateCopy.y = y;
+    this.setState(stateCopy, () => {
+      let stateCopy = this.state;
+      stateCopy.class = { top: this.state.y, left: this.state.x };
+      this.setState(stateCopy);
     });
   }
 
