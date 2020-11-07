@@ -3,22 +3,62 @@ import "../styles/App.css";
 class Timer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { time: 0, x: 0, y: 0 };
+    this.state = {
+      is_started: false,
+      class: { top: 0, left: 0 },
+      time: 0,
+      x: 0,
+      y: 0
+    };
+    this.handleClick = this.handleClick.bind(this);
+    this.intervalId = 0;
   }
   componentDidMount() {
-    
+    document.addEventListener("keydown", (event) => {
+      let x = this.state.x;
+      let y = this.state.y;
+      if (event.keyCode === 37) {
+        x -= 5;
+      } else if (event.keyCode === 38) {
+        y -= 5;
+      } else if (event.keyCode === 39) {
+        x += 5;
+      } else if (event.keyCode === 40) {
+        y += 5;
+      }
+      let stateCopy = this.state;
+      stateCopy.x = x;
+      stateCopy.y = y;
+      this.setState(stateCopy, () => {
+        let stateCopy = this.state;
+        stateCopy.class = { top: this.state.y, left: this.state.x };
+        this.setState(stateCopy);
+      });
+    });
   }
 
-  componentWillUnmount() {
-    
+  componentWillUnmount() {}
+
+  handleClick() {
+    let stateCopy = this.state;
+    stateCopy.is_started = !this.state.is_started;
+    this.setState(stateCopy);
   }
-
-
 
   render() {
     return (
- <>
-</>
+      <>
+        {this.state.is_started ? (
+          <>
+            <div className="ball" style={this.state.class}></div>
+            <div className="hole"></div>
+            <div className="heading-timer">{this.state.time}</div>
+          </>
+        ) : null}
+        <button className="start" onClick={this.handleClick}>
+          start
+        </button>
+      </>
     );
   }
 }
